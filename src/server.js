@@ -27,6 +27,13 @@ app.get("/", (_req, res) => {
 // 4) 全局错误处理
 app.use(errorHandler);
 
+console.log(
+    "[flags]",
+    "LOG_REQUESTS=", (process.env.LOG_REQUESTS || "").trim(),
+    "SAVE_PAYLOADS=", (process.env.SAVE_PAYLOADS || "").trim(),
+    "ALLOW_UNVERIFIED=", (process.env.ALLOW_UNVERIFIED || "").trim()
+);
+
 app.listen(PORT, () => {
     console.log(`🚀 Listening on http://localhost:${PORT}`);
     console.log("Routes are auto-mounted based on src/routes/** file paths");

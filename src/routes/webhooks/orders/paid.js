@@ -5,8 +5,13 @@ const hmacVerify = require("../../../middleware/hmacVerify");
 const router = express.Router();
 const RAW_LIMIT = process.env.WEBHOOK_RAW_LIMIT || "5mb";
 const SECRET = process.env.SHOPIFY_WEBHOOK_SECRET || "";
-const ALLOW_UNVERIFIED = process.env.ALLOW_UNVERIFIED === "1";
-const SAVE_PAYLOADS = process.env.SAVE_PAYLOADS === "1";
+const flag = (k) => /^1|true|yes$/i.test((process.env[k] || "").trim());
+const ALLOW_UNVERIFIED = flag("ALLOW_UNVERIFIED");
+const SAVE_PAYLOADS = flag("SAVE_PAYLOADS");
+console.log(`[flags] SAVE_PAYLOADS=${SAVE_PAYLOADS}, ALLOW_UNVERIFIED=${ALLOW_UNVERIFIED}`);
+if (!SECRET && !ALLOW_UNVERIFIED) {
+    console.warn("⚠️ WARNING: SHOPIFY_WEBHOOK_SECRET is not set! All incoming webhooks will be rejected unless ALLOW_UNVERIFIED=1 is set.");
+}
 
 // 仅此路由树使用 raw (必须在任何 json() 之前)
 router.use(express.raw({ type: "application/json", limit: RAW_LIMIT }));
@@ -19,7 +24,9 @@ router.post("/", (req, res) => {
     const headers = req.headers;
     const raw = req.body;              // Buffer
     const rawText = raw.toString("utf8");
-    const topic = req.get("X-Shopify-Topic");
+    const topic = (req.get("X-Shopify-Topic") || "unknown").replace(/\//g, "_");
+    const wid = req.get("X-Shopify-Webhook-Id") || "noWid";
+    const ts = new Date().toISOString().replace(/[:.]/g, "-");
 
     // 先 ACK, 避免 Shopify 重试
     res.status(200).send("OK");
@@ -46,10 +53,11 @@ router.post("/", (req, res) => {
         console.log("=== FULL ORDER OBJECT END ===");
 
         if (SAVE_PAYLOADS) {
-            const saved = saveRawJSON(`order_${order.id || Date.now()}_paid.json`, rawText);
+            const fileName = `${topic}_${order.id || "noOrderId"}_${wid}_${ts}.json`;
+            const saved = saveRawJSON(fileName, rawText);
             console.log(`✔ 已保存完整订单到 ${saved}`);
         } else {
-            console.log(" (未保存原始负载, 设置 SAVE_PAYLOADS=1 可开启落盘)");
+            console.log("（未保存原始负载，设置 SAVE_PAYLOADS=1 可开启落盘）");
         }
     } catch (e) {
         console.error("JSON parse failed (但已打印 RAW BODY):", e);
