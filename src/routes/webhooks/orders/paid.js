@@ -24,16 +24,20 @@ router.post("/", (req, res) => {
     const headers = req.headers;
     const raw = req.body;              // Buffer
     const rawText = raw.toString("utf8");
-    const topic = (req.get("X-Shopify-Topic") || "unknown").replace(/\//g, "_");
+    const rawTopic = req.get("X-Shopify-Topic") || "";
+    const EXPECTED_TOPIC = "orders/paid";
     const wid = req.get("X-Shopify-Webhook-Id") || "noWid";
     const ts = new Date().toISOString().replace(/[:.]/g, "-");
+
+    // 仅用于生成文件名
+    const topicForFile = (rawTopic || "unknown").replace(/\//g, "_");
 
     // 先 ACK, 避免 Shopify 重试
     res.status(200).send("OK");
 
     // 可选：健壮性提示 (测试负载有时不匹配主题)
-    if (topic && topic !== "orders/paid") {
-        console.warn(`[提示] 该请求的 X-Shopify-Topic=${topic}, 但你挂的是 /orders/paid。`);
+    if (rawTopic && rawTopic !== EXPECTED_TOPIC) {
+        console.warn(`[提示] 该请求的 X-Shopify-Topic=${rawTopic}, 但你挂的是 /${EXPECTED_TOPIC}。`);
     }
 
     // 打印头 + 原文 (仅 stdout, 不落盘)
@@ -53,7 +57,7 @@ router.post("/", (req, res) => {
         // console.log("=== FULL ORDER OBJECT END ===");
 
         if (SAVE_PAYLOADS) {
-            const fileName = `${topic}_${order.id || "noOrderId"}_${wid}_${ts}.json`;
+            const fileName = `${topicForFile}_${order.id || "noOrderId"}_${wid}_${ts}.json`;
             const saved = saveRawJSON(fileName, rawText);
             if (saved) console.log(`✔ 已保存到 ${saved}`);
         } else {
