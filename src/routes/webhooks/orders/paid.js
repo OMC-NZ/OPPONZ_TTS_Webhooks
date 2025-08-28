@@ -37,25 +37,25 @@ router.post("/", (req, res) => {
     }
 
     // 打印头 + 原文 (仅 stdout, 不落盘)
-    console.log("=== HEADERS START ===");
-    console.dir(headers, { depth: null, maxArrayLength: null });
-    console.log("=== HEADERS END ===");
+    // console.log("=== HEADERS START ===");
+    // console.dir(headers, { depth: null, maxArrayLength: null });
+    // console.log("=== HEADERS END ===");
 
-    console.log("=== RAW BODY START ===");
-    console.log(rawText);
-    console.log("=== RAW BODY END ===");
+    // console.log("=== RAW BODY START ===");
+    // console.log(rawText);
+    // console.log("=== RAW BODY END ===");
 
     // 解析 & (可选)落盘
     try {
         const order = JSON.parse(rawText);
-        console.log("=== FULL ORDER OBJECT START ===");
-        console.dir(order, { depth: null, maxArrayLength: null });
-        console.log("=== FULL ORDER OBJECT END ===");
+        // console.log("=== FULL ORDER OBJECT START ===");
+        // console.dir(order, { depth: null, maxArrayLength: null });
+        // console.log("=== FULL ORDER OBJECT END ===");
 
         if (SAVE_PAYLOADS) {
             const fileName = `${topic}_${order.id || "noOrderId"}_${wid}_${ts}.json`;
             const saved = saveRawJSON(fileName, rawText);
-            console.log(`✔ 已保存完整订单到 ${saved}`);
+            if (saved) console.log(`✔ 已保存到 ${saved}`);
         } else {
             console.log("（未保存原始负载，设置 SAVE_PAYLOADS=1 可开启落盘）");
         }
