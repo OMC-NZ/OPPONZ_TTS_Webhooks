@@ -9,7 +9,12 @@ function saveRawJSON(fileName, rawText, opts = {}) {
     const force = !!opts.force;
     if (!force && !SAVE_ENABLED) return null; // 直接不写、不建目录
 
-    const day = new Date().toISOString().slice(0, 10);
+    const day = new Date().toLocaleDateString("en-NZ", {
+        timeZone: "Pacific/Auckland",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+    }).split("/").reverse().join("-");
     const logsRoot = path.join(process.cwd(), "logs", day);
     ensureDir(logsRoot);
 

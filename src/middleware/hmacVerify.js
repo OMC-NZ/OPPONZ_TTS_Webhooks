@@ -2,7 +2,7 @@ const crypto = require("crypto");
 
 /**
  * @param {{ secret?: string, allowUnverified?: boolean }} opts
- *  - secret: SHOPIFY_WEBHOOK_SECRET
+ *  - secret: WEBHOOK_SECRET
  *  - allowUnverified: 开发调试时可允许签名不通过仍放行
  */
 module.exports = function hmacVerify({ secret, allowUnverified = false } = {}) {
@@ -17,7 +17,7 @@ module.exports = function hmacVerify({ secret, allowUnverified = false } = {}) {
         const raw = req.body; // Buffer (要求上游使用 express.raw)
 
         if (!secret) {
-            console.warn("⚠️  SHOPIFY_WEBHOOK_SECRET 未设置——跳过验签, 仅用于开发环境。");
+            console.warn("⚠️  WEBHOOK_SECRET 未设置——跳过验签, 仅用于开发环境。");
             return next();
         }
 
