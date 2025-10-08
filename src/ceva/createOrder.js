@@ -67,6 +67,42 @@ async function createOrder(body) {
         "lineDetails": lineDetails,
     };
 
+    // const payload = {
+    //     "senderId": "OPPONZ",
+    //     "orderID": "TTS9993",
+    //     "action": "create",
+    //     "tpid": "BPNZJDE",
+    //     "tpid_version": "ORCH001",
+    //     "billTo": "2086822",
+    //     "shipTo": "2086823",
+    //     "requestedDate": toLocalISOStringWithoutTZ(body.created_at),
+    //     "poRecyclingPeriodInMonths": 99999,
+    //     "shippingAddress": {
+    //         "organisation": body.shipping_address.company ?? "",
+    //         "recipient": body.shipping_address.name,
+    //         "deliveryAddress": body.shipping_address.address1,
+    //         "suburb": body.shipping_address.address2,
+    //         "city": body.shipping_address.province,
+    //         "countryCode": "NZ",
+    //         "postCode": body.shipping_address.zip,
+    //         "mobileNumber": body.shipping_address.phone ?? "",
+    //     },
+    //     "lineDetails": [
+    //         {
+    //             productType: "C",
+    //             branch: "4002",
+    //             productCode: "WHILL MODEL C BLACK",
+    //             requestedQuantity: 1,
+    //         },
+    //         {
+    //             productType: "C",
+    //             branch: "4002",
+    //             productCode: "D183S",
+    //             requestedQuantity: 1,
+    //         }
+    //     ],
+    // }
+
     const res = await postJSONWithRetries(
         url,
         payload,
