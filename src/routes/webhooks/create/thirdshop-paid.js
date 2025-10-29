@@ -1,3 +1,6 @@
+// 开始是为了trademe支付的订单，由于来自trademe的这类订单被创建在shopify中时已是已支付的状态，
+// 所以它并不会被shopify的Paid事件所捕获，也就不会触发“Order Paid”事件。
+// 因此只能通过“Order Created”事件来捕捉这类订单。
 const express = require("express");
 const hmacVerify = require("../../../middleware/hmacVerify");
 const { saveRawJSON } = require("../../../utils/files");

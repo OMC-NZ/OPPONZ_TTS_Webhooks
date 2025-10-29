@@ -8,7 +8,8 @@ const mountAllRoutes = require("./routes/_loader");
 const on = (k) => /^1|true|yes$/i.test((process.env[k] || "").trim());
 
 const app = express();
-const PORT = Number(process.env.PORT || 3000);
+const isProd = process.env.NODE_ENV === "production";
+const PORT = Number(process.env.PORT || (isProd ? 3001 : 3000));
 
 // 1) 按开关启用访问日志
 if (on("LOG_REQUESTS")) {

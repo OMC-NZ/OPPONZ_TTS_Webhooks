@@ -1,6 +1,7 @@
 const express = require("express");
 const hmacVerify = require("../../../middleware/hmacVerify");
-const { notifyFn } = require("../../../mailContent/fnNotifier")
+const createOrder = require("../../../gilrose/createOrder");
+const { gilroselimitprice } = require("../../../mailContent/gilroselimitprice");
 
 const router = express.Router();
 const RAW_LIMIT = process.env.WEBHOOK_RAW_LIMIT || "5mb";
@@ -15,8 +16,9 @@ router.use(express.raw({ type: "application/json", limit: RAW_LIMIT }));
 router.use(hmacVerify({ secret: SECRET, allowUnverified: ALLOW_UNVERIFIED }));
 
 // 由于自动挂载：此文件映射到 /webhooks/orders/create, 所以这里就是 POST "/"
-router.post("/", (req, res) => {           // Buffer
+router.post("/", async (req, res) => {  // Buffer format
     const rawText = req.body.toString("utf8");
+    const order = JSON.parse(rawText);
     const rawTopic = req.get("X-Shopify-Topic") || "";
     const EXPECTED_TOPIC = "orders/create";
 
@@ -30,17 +32,24 @@ router.post("/", (req, res) => {           // Buffer
 
     // 解析 & (可选)落盘
     try {
-        const order = JSON.parse(rawText);
+        // 正则表达式去检索是否包含匹配关键词，而不是完全匹配。
+        const hasGilrose = Array.isArray(order.payment_gateway_names) && order.payment_gateway_names.some(s => /gilrose/i.test(String(s)));
+        if (!hasGilrose) return;
 
-        // 如果 payment_gateway_names 包含 "Gilrose" → 发送邮件
-        const gateways = Array.isArray(order.payment_gateway_names) ? order.payment_gateway_names : [];
-        const hasGilrose = gateways.map(String).some((s) => s.toLowerCase() === "gilrose");
-        if (hasGilrose) {
-            // 异步发送，不阻塞 webhook 响应
-            notifyFn(order).catch((err) => console.error("notifyFn error:", err));
+        const LIMIT_CENTS = 499;
+
+        if (order.total_price >= LIMIT_CENTS) {
+            const result = await createOrder(order);
+            console.log('[createOrder]', result);
+            return result
+        } else {
+            const limitPriceResult = await gilroselimitprice(order);
+            console.log('[GilroseLimit]', limitPriceResult);
+            return limitPriceResult;
         }
     } catch (e) {
         console.error("JSON parse failed:", e);
+        throw e;
     }
 });
 

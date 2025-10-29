@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const { setTimeout: sleep } = require("timers/promises");
 
 async function fetchWithTimeout(url, options = {}, ms = 15000) {
@@ -14,15 +15,31 @@ async function postJSONWithRetries(url, body, headers = {}, {
     timeoutMs = 15000,
     retries = 2,
     baseDelayMs = 500,
+    clientId,
+    hmacKey,
 } = {}) {
     let attempt = 0;
     let lastErr;
 
     while (attempt <= retries) {
         try {
+            const timestamp = Date.now().toString();
+            const idempotencyKey = crypto.randomUUID();
+
+            const dataToSign = `${timestamp}${idempotencyKey}${JSON.stringify(body)}`;
+            const signature = crypto.createHmac('sha256', hmacKey).update(dataToSign).digest('hex');
+            const fullHeaders = {
+                "Content-Type": "application/json",
+                "X-Client-Id": clientId,
+                "X-Timestamp": timestamp,
+                "Idempotency-Key": idempotencyKey,
+                "X-Signature": signature,
+                ...headers,
+            };
+
             const res = await fetchWithTimeout(url, {
                 method: "POST",
-                headers: { "Content-Type": "application/json", ...headers },
+                headers: fullHeaders,
                 body: JSON.stringify(body),
             }, timeoutMs);
 
