@@ -14,7 +14,7 @@ async function gilroselimitprice(order) {
 
   const html = `
     <p>Hi ${displayName || "there"},</p>
-    <p>Thank you for your recent order ${orderNo}]) with OPPO eStore.</p>
+    <p>Thank you for your recent order ${orderNo} with OPPO eStore.</p>
     <p>Unfortunately, we are unable to process your payment through Gilrose for this order since it's below the minimum transaction amount required by Gilrose, which is NZD $499 and above.</p>
     <p>We'll be happy to help arrange an alternative payment option so you can receive your order without delay.</p>
     <p>To complete your purchase, please reply to this email (online@oppomobile.nz).</p>
