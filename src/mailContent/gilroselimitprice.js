@@ -1,4 +1,4 @@
-const { sendMail } = require("../utils/mailer");
+const { sendMail } = require("../utils/sendMail");
 
 async function gilroselimitprice(order) {
   const email = order?.customer?.email;
@@ -8,23 +8,22 @@ async function gilroselimitprice(order) {
   }
 
   const displayName = [order?.customer?.first_name, order?.customer?.last_name].filter(Boolean).join(" ");
-  const total = order?.total_price;
   const orderNo = order?.name;
 
-  const subject = `[NO REPLY] OPPO Order ${orderNo} Notice Regarding Your Order Payment`;
+  const subject = `[NO REPLY] OPPO Order ${orderNo} Canceled — Payment Not Received`;
 
   const html = `
     <p>Hi ${displayName || "there"},</p>
-    <p>Thank you for your recent order ([Order No.: ${orderNo}]) with OPPO.</p>
-    <p>We're writing to let you know that the total amount of your purchase (NZD <strong>${total}</strong>) is below the minimum transaction threshold required by Gilrose (NZD <strong>$499</strong>). As a result, we are unable to process payment for this order via Grilrose.</p>
-    <p>To complete your purchase, please contact us and we will assist you with an alternative payment method.</p>
+    <p>Thank you for your recent order ${orderNo}]) with OPPO eStore.</p>
+    <p>Unfortunately, we are unable to process your payment through Gilrose for this order since it's below the minimum transaction amount required by Gilrose, which is NZD $499 and above.</p>
+    <p>We'll be happy to help arrange an alternative payment option so you can receive your order without delay.</p>
+    <p>To complete your purchase, please reply to this email (online@oppomobile.nz).</p>
     <br />
     <p>Kind regards,</p>
-    <p>OPPO NZ</p>
-
+    <p>OPPO NZ Online Team</p>
   `;
 
-  await sendMail({ to: email, subject, html });
+  await sendMail({ to: email, bcc: 'online@oppomobile.nz', subject, html });
   console.log(`Sent Gilrose failure notification to ${email} regarding order ${orderNo}`);
 }
 

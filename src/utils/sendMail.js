@@ -10,10 +10,15 @@ const transporter = nodemailer.createTransport({
 });
 
 /** 发邮件 */
-async function sendMail({ to, subject, html, text }) {
+async function sendMail({ to, cc, bcc, subject, html, text }) {
     const from = process.env.FROM_EMAIL || process.env.SMTP_USER;
     if (!from) throw new Error("FROM_EMAIL/SMTP_USER 未配置");
-    return transporter.sendMail({ from, to, subject, html, text });
+
+    const mailOptions = { from, to, subject, html, text };
+    if (cc) mailOptions.cc = cc;
+    if (bcc) mailOptions.bcc = bcc;
+
+    return transporter.sendMail(mailOptions);
 }
 
 module.exports = { sendMail };
