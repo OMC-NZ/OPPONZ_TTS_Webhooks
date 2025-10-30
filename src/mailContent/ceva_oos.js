@@ -1,4 +1,4 @@
-const { sendMail } = require("../utils/mailer");
+const { sendMail } = require("../utils/sendMail");
 
 const ceva_oos = async (order) => {
     const toEmail = "nz.dev@oppomobile.nz;"; //"Sunny.Kim@oppomobile.nz; Lisa.Naidoo@oppomobile.nz;";
