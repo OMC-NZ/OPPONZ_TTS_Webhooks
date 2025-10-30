@@ -14,7 +14,7 @@ const ceva_oos = async (order) => {
                 </div>`;
 
     try {
-        const info = await sendMail({ to: toEmail, subject, html });
+        const info = await sendMail({ to: toEmail, subject, html, key: 'ONLINEKONEC' });
         // console.log("noreply-TTS Order sending successfully:", info);
     } catch (err) {
         console.error("noreply-TTS Order sending failed:", err);

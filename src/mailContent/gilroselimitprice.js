@@ -23,7 +23,7 @@ async function gilroselimitprice(order) {
     <p>OPPO NZ Online Team</p>
   `;
 
-  await sendMail({ to: email, bcc: 'online@oppomobile.nz', subject, html });
+  await sendMail({ to: email, bcc: 'online@oppomobile.nz', subject, html, key: 'ONLINEOPPO' });
   console.log(`Sent Gilrose failure notification to ${email} regarding order ${orderNo}`);
 }
 
