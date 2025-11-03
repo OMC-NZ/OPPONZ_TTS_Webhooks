@@ -1,7 +1,8 @@
 const { sendMail } = require("../utils/sendMail");
 
 const ceva_oos = async (order) => {
-    const toEmail = "nz.dev@oppomobile.nz;"; //"Sunny.Kim@oppomobile.nz; Lisa.Naidoo@oppomobile.nz;";
+    const toEmail = "Sunny.Kim@oppomobile.nz"; //"nz.dev@oppomobile.nz; Lisa.Naidoo@oppomobile.nz;";
+    const toCC = "nz.dev@oppomobile.nz, Lisa.Naidoo@oppomobile.nz";
     const subject = `noreply-TTS Order ${order.orderID} Errors`;
     const html = `
                 <div>
@@ -14,7 +15,7 @@ const ceva_oos = async (order) => {
                 </div>`;
 
     try {
-        const info = await sendMail({ to: toEmail, subject, html, key: 'ONLINEKONEC' });
+        const info = await sendMail({ to: toEmail, cc: toCC, subject, html, key: 'ONLINEKONEC' });
         // console.log("noreply-TTS Order sending successfully:", info);
     } catch (err) {
         console.error("noreply-TTS Order sending failed:", err);
