@@ -2,7 +2,7 @@ const { sendMail } = require("../utils/sendMail");
 
 const ceva_oos = async (order) => {
     const toEmail = "Sunny.Kim@oppomobile.nz"; //"nz.dev@oppomobile.nz; Lisa.Naidoo@oppomobile.nz;";
-    const toCC = "nz.dev@oppomobile.nz, Lisa.Naidoo@oppomobile.nz";
+    const toCC = "nz.dev@oppomobile.nz";
     const subject = `noreply-TTS Order ${order.orderID} Errors`;
     const html = `
                 <div>
