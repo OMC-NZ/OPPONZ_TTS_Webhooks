@@ -40,8 +40,6 @@ router.post("/", async (req, res) => {
         console.warn(`[提示] 该请求的 X-Shopify-Topic=${rawTopic}, 但你挂的是 /${EXPECTED_TOPIC}。`);
     }
 
-    const data = await createOrder(order);
-
     // 解析 & (可选)落盘
     try {
         console.log("=== FULL ORDER OBJECT START ===");
