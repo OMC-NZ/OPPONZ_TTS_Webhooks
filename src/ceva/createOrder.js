@@ -1,6 +1,6 @@
 require("dotenv").config();
 const getCEVAToken = require("./Token");
-const { postJSONWithRetries } = require("../utils/postJSONWithRetries");
+const { postJSONToCEVA } = require("../utils/postJSONToCEVA");
 
 function toLocalISOStringWithoutTZ(dateStr) {
     const d = new Date(dateStr);
@@ -103,7 +103,7 @@ async function createOrder(body) {
     //     ],
     // }
 
-    const res = await postJSONWithRetries(
+    const res = await postJSONToCEVA(
         url,
         payload,
         { Authorization: `Bearer ${token}` }, // headers

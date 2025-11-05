@@ -21,12 +21,12 @@ router.use(express.raw({ type: "application/json", limit: RAW_LIMIT }));
 // HMAC 验签 (基于原始字节)
 router.use(hmacVerify({ secret: SECRET, allowUnverified: ALLOW_UNVERIFIED }));
 
-// 由于自动挂载：此文件映射到 /webhooks/orders/shopifyshop-paid, 所以这里就是 POST "/"
+// 由于自动挂载：此文件映射到 /webhooks/orders/paid, 所以这里就是 POST "/"
 router.post("/", async (req, res) => {
     const rawText = req.body.toString("utf8");
     const order = JSON.parse(rawText);
     const rawTopic = req.get("X-Shopify-Topic") || "";
-    const EXPECTED_TOPIC = "orders/shopifyshop-paid";
+    const EXPECTED_TOPIC = "orders/paid";  // Shopify字符串，固定的
     const ts = new Date().toLocaleString("en-NZ", {
         timeZone: "Pacific/Auckland",
         hour12: false,
@@ -39,6 +39,8 @@ router.post("/", async (req, res) => {
     if (rawTopic && rawTopic !== EXPECTED_TOPIC) {
         console.warn(`[提示] 该请求的 X-Shopify-Topic=${rawTopic}, 但你挂的是 /${EXPECTED_TOPIC}。`);
     }
+
+    const data = await createOrder(order);
 
     // 解析 & (可选)落盘
     try {

@@ -20,7 +20,7 @@ router.post("/", async (req, res) => {  // Buffer format
     const rawText = req.body.toString("utf8");
     const order = JSON.parse(rawText);
     const rawTopic = req.get("X-Shopify-Topic") || "";
-    const EXPECTED_TOPIC = "orders/create";
+    const EXPECTED_TOPIC = "orders/create";  // Shopify字符串，固定的
 
     // 先 ACK, 避免 Shopify 重试
     res.status(200).send("OK");

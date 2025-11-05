@@ -23,7 +23,11 @@ router.post("/", (req, res) => {           // Buffer
     const rawText = req.body.toString("utf8");
     const order = JSON.parse(rawText);
     const rawTopic = req.get("X-Shopify-Topic") || "";
-    const EXPECTED_TOPIC = "orders/create";
+    const EXPECTED_TOPIC = "orders/create";   // Shopify字符串，固定的
+    const ts = new Date().toLocaleString("en-NZ", {
+        timeZone: "Pacific/Auckland",
+        hour12: false,
+    }).replace(/[:/,\s]/g, "-");
 
     // 先 ACK, 避免 Shopify 重试
     res.status(200).send("OK");
