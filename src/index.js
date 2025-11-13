@@ -33,7 +33,6 @@ app.use(errorHandler);
 console.log(
     "[flags]",
     "LOG_REQUESTS=", (process.env.LOG_REQUESTS || "").trim(),
-    "SAVE_PAYLOADS=", (process.env.SAVE_PAYLOADS || "").trim(),
     "ALLOW_UNVERIFIED=", (process.env.ALLOW_UNVERIFIED || "").trim()
 );
 

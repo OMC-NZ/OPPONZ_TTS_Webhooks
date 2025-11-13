@@ -9,6 +9,7 @@ const ceva_oos = async (order) => {
                     <p>Hi team,</p>
                     <p>Several items in order <strong>${order.orderID}</strong> appear to be incorrect. Please see the message below for details.</p>
                     <div>
+                        <strong>Error Type</strong>: ${order.errorWarnings[0].errorType}<br/>
                         <strong>Error Code</strong>: ${order.errorWarnings[0].errorCode}<br/>
                         <strong>Error Description</strong>: ${order.errorWarnings[0].errorDescription}
                     </div>
