@@ -16,9 +16,9 @@ function toLocalISOStringWithoutTZ(dateStr) {
 function normalizeLineDetails(input) {
     const arr = Array.isArray(input) ? input : [input];
     return arr.reduce((acc, item) => {
-        const sku = (item.sku ?? "").toString();
-        // 如果 sku 含 OPPO，就跳过（不 push）
-        if (sku.toUpperCase().includes("OPPO")) {
+        const title = (item.title ?? "").toString();
+        // 如果 title 含 OPPO，就跳过（不 push）
+        if (title.toUpperCase().includes("OPPO")) {
             return acc;
         }
 
@@ -89,18 +89,18 @@ async function createOrder(body) {
     //     },
     //     "lineDetails": [
     //         {
-    //             productType: "C",
-    //             branch: "4002",
-    //             productCode: "WHILL MODEL C BLACK",
-    //             requestedQuantity: 1,
+    //             "productType": "C",
+    //             "branch": "4002",
+    //             "productCode": "WHILL MODEL C BLACK",
+    //             "requestedQuantity": 1,
     //         },
     //         {
-    //             productType: "C",
-    //             branch: "4002",
-    //             productCode: "D183S",
-    //             requestedQuantity: 1,
+    //             "productType": "C",
+    //             "branch": "4002",
+    //             "productCode": "D183S",
+    //             "requestedQuantity": 1,
     //         }
-    //     ],
+    //     ]
     // }
 
     const res = await postJSONToCEVA(
