@@ -33,16 +33,8 @@ router.post("/", async (req, res) => {           // Buffer
     }
 
     let order;
-    try {
+    try {        
         order = JSON.parse(rawText);
-    } catch (e) {
-        console.error("JSON parse failed:", e);
-        const saved = saveRawJSON(`orderError_trademe_${Date.now()}.json`, rawText);
-        if (saved) console.log(`✔ 已保存原始负载到 ${saved}`);
-        return;
-    }
-
-    try {
         // tags 可能是字符串或数组，统一转小写字符串后匹配
         const tagsText = Array.isArray(order.tags) ? order.tags.join(",") : String(order.tags || "");
         console.log(tagsText)
