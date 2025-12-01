@@ -18,7 +18,7 @@ function normalizeLineDetails(input) {
     return arr.reduce((acc, item) => {
         const title = (item.title ?? "").toString();
         // 如果 title 含 OPPO，就跳过（不 push）
-        if (title.toUpperCase().includes("OPPO")) {
+        if (title.toUpperCase().includes("OPPO") || title.toUpperCase().includes("ULTIMATE")) {
             return acc;
         }
 

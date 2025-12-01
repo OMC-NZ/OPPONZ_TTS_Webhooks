@@ -45,6 +45,7 @@ router.post("/", async (req, res) => {           // Buffer
     try {
         // tags 可能是字符串或数组，统一转小写字符串后匹配
         const tagsText = Array.isArray(order.tags) ? order.tags.join(",") : String(order.tags || "");
+        console.log(tagsText)
         if (/\btrademe\b/i.test(tagsText)) {
             const data = await createOrder(order);
             const type = data?.errorWarnings?.[0]?.errorType;
