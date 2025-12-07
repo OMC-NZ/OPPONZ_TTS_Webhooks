@@ -39,6 +39,7 @@ router.post("/", async (req, res) => {           // Buffer
         const tagsText = Array.isArray(order.tags) ? order.tags.join(",") : String(order.tags || "");
         console.log(tagsText)
         if (/\btrademe\b/i.test(tagsText)) {
+            console.log("if 触发 trademe 订单处理逻辑");
             const data = await createOrder(order);
             const type = data?.errorWarnings?.[0]?.errorType;
 
