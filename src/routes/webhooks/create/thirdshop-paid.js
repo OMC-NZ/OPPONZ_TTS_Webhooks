@@ -33,11 +33,12 @@ router.post("/", async (req, res) => {           // Buffer
     }
 
     let order;
-    try {        
+    console.log(rawText)
+
+    try {
         order = JSON.parse(rawText);
         // tags 可能是字符串或数组，统一转小写字符串后匹配
         const tagsText = Array.isArray(order.tags) ? order.tags.join(",") : String(order.tags || "");
-        console.log(tagsText)
         if (/\btrademe\b/i.test(tagsText)) {
             console.log("if 触发 trademe 订单处理逻辑");
             const data = await createOrder(order);
