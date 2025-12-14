@@ -9,7 +9,7 @@ const { ceva_oos } = require("../../../mailContent/ceva_oos");
 
 const router = express.Router();
 const RAW_LIMIT = process.env.WEBHOOK_RAW_LIMIT || "5mb";
-const SECRET = process.env.OPPOSTORE_WEBHOOK_SECRET || "";
+const SECRET = process.env.TTS_WEBHOOK_SECRET || "";
 const ALLOW_UNVERIFIED = /^(1|true|yes)$/i.test((process.env.ALLOW_UNVERIFIED || "").trim());
 
 // 仅此路由树使用 raw (必须在任何 json() 之前)
@@ -39,6 +39,7 @@ router.post("/", async (req, res) => {           // Buffer
         order = JSON.parse(rawText);
         // tags 可能是字符串或数组，统一转小写字符串后匹配
         const tagsText = Array.isArray(order.tags) ? order.tags.join(",") : String(order.tags || "");
+        
         if (/\btrademe\b/i.test(tagsText)) {
             console.log("if 触发 trademe 订单处理逻辑");
             const data = await createOrder(order);
