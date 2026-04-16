@@ -4,7 +4,7 @@
 const express = require("express");
 const hmacVerify = require("../../../middleware/hmacVerify");
 const { saveRawJSON } = require("../../../utils/files");
-const createOrder = require("../../../ceva/createOrder");
+const caveCreateOrder = require("../../../ceva/createOrder");
 const { ceva_oos } = require("../../../mailContent/ceva_oos");
 
 const router = express.Router();
@@ -41,7 +41,7 @@ router.post("/", async (req, res) => {           // Buffer
         
         if (/\btrademe\b/i.test(tagsText)) {
             console.log("触发 trademe 订单处理逻辑");
-            const data = await createOrder(order);
+            const data = await caveCreateOrder(order);
             const type = data?.errorWarnings?.[0]?.errorType;
 
             if (type === "API_Warning") {

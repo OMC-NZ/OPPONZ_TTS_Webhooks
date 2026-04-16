@@ -1,7 +1,7 @@
 const express = require("express");
 const { saveRawJSON } = require("../../../utils/files");
 const hmacVerify = require("../../../middleware/hmacVerify");
-const createOrder = require("../../../ceva/createOrder");
+const caveCreateOrder = require("../../../ceva/createOrder");
 const { ceva_oos } = require("../../../mailContent/ceva_oos");
 
 const router = express.Router();
@@ -43,7 +43,7 @@ router.post("/", async (req, res) => {
     }
 
     try {
-        const data = await createOrder(order);
+        const data = await caveCreateOrder(order);
         const type = data?.errorWarnings?.[0]?.errorType;
 
         if (type === "API_Warning") {
