@@ -11,7 +11,6 @@ async function createOrder(body) {
     if (!customer.first_name?.trim()) missingFields.push("customer.first_name");
     if (!customer.last_name?.trim()) missingFields.push("customer.last_name");
     if (!customer.email?.trim()) missingFields.push("customer.email");
-    if (!customer.phone?.trim()) missingFields.push("customer.phone");
     if (missingFields.length > 0) {
         console.warn("[createOrder] customer 信息缺失", {
             orderName: body.name,
@@ -34,7 +33,7 @@ async function createOrder(body) {
             "firstName": customer.first_name,
             "lastName": customer.last_name,
             "email": customer.email,
-            "phone": customer.phone
+            "phone": customer.phone ?? "64000000000" // Shopify 可能返回空字符串，Gilrose 要求非空，所以用一个默认值占位
         },
         "purchaseDate": body.created_at,
         "eventId": body.id,
