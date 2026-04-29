@@ -1,4 +1,5 @@
 const crypto = require("crypto");
+const { getNZLogTime } = require("../utils/timeUtils");
 
 /**
  * @param {{ secret?: string, allowUnverified?: boolean }} opts
@@ -17,13 +18,13 @@ module.exports = function hmacVerify({ secret, allowUnverified = false } = {}) {
         const raw = req.body; // Buffer (要求上游使用 express.raw)
 
         if (!secret) {
-            console.warn("⚠️  WEBHOOK_SECRET 未设置——跳过验签, 仅用于开发环境。");
+            console.warn(`[${getNZLogTime()}] WEBHOOK_SECRET 未设置——跳过验签, 仅用于开发环境。`);
             return next();
         }
 
         const computed = crypto.createHmac("sha256", secret).update(raw).digest("base64");
         if (!safeEq(computed, sigHeader)) {
-            console.error("✖ HMAC 验签失败。computed =", computed, "header =", sigHeader);
+            console.error(`[${getNZLogTime()}] ✖ HMAC 验签失败。computed =`, computed, "header =", sigHeader);
             if (!allowUnverified) return res.status(401).send("Invalid HMAC");
         }
         next();

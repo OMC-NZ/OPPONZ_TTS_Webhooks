@@ -1,4 +1,5 @@
 const { sendMail } = require("../utils/sendMail");
+const { getNZLogTime } = require("../utils/timeUtils");
 
 const ceva_oos = async (order) => {
     const toEmail = "nz.dev@oppomobile.nz"; //"nz.dev@oppomobile.nz; Lisa.Naidoo@oppomobile.nz;";
@@ -19,7 +20,7 @@ const ceva_oos = async (order) => {
         const info = await sendMail({ to: toEmail, subject, html, key: 'ONLINEKONEC' });
         // console.log("noreply-TTS Order sending successfully:", info);
     } catch (err) {
-        console.error("noreply-TTS Order sending failed:", err);
+        console.error(`[${getNZLogTime()}] noreply-TTS Order sending failed:`, err);
     }
 };
 

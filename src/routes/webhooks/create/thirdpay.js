@@ -28,7 +28,7 @@ router.post("/", async (req, res) => {  // Buffer format
     // 可选：健壮性提示 (测试负载有时不匹配主题)
     const topic = req.get("X-Shopify-Topic");
     if (topic && topic !== "orders/create") {
-        console.warn(`[提示] X-Shopify-Topic=${topic}, 但路由为 /orders/create`);
+        console.warn(`[${getNZLogTime()}] [提示] X-Shopify-Topic=${topic}, 但路由为 /orders/create`);
     }
 
     let order;
@@ -39,7 +39,7 @@ router.post("/", async (req, res) => {  // Buffer format
             total_price: order?.total_price
         });
     } catch (e) {
-        console.error("JSON parse failed:", e);
+        console.error(`[${getNZLogTime()}] JSON parse failed:`, e);
         return;
     }
 
@@ -78,6 +78,7 @@ router.post("/", async (req, res) => {  // Buffer format
                     await sendMail({ to: process.env.ADMIN_EMAIL, subject, html, key: "ONLINEOPPO" });
                 } catch (mailError) {
                     console.error("[sendMail 失败]", {
+                        time: getNZLogTime(),
                         orderName: order?.name,
                         message: mailError?.message,
                         stack: mailError?.stack
@@ -92,6 +93,7 @@ router.post("/", async (req, res) => {  // Buffer format
         }
     } catch (e) {
         console.error("处理订单失败:", {
+            time: getNZLogTime(),
             orderName: order?.name,
             message: e?.message,
             stack: e?.stack

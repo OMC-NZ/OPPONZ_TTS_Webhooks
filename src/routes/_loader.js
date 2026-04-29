@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const { getNZLogTime } = require("../utils/timeUtils");
 
 /**
  * 自动把 src/routes 下所有 .js 文件作为 Router 挂到 "/" + 相对路径
@@ -21,7 +22,7 @@ module.exports = function mountAllRoutes(app, options = {}) {
 
         const router = require(absFile);
         if (!router || typeof router !== "function" || !router.stack) {
-            console.warn(`⚠️  routes/${rel} 未导出 express.Router, 已跳过`);
+            console.warn(`[${getNZLogTime()}] routes/${rel} 未导出 express.Router, 已跳过`);
             return;
         }
 

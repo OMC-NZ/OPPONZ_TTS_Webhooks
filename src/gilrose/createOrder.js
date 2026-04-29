@@ -1,5 +1,6 @@
 require("dotenv").config();
 const { postJSONWithRetries } = require("../utils/postJSONWithRetries");
+const { getNZLogTime } = require("../utils/timeUtils");
 
 async function createOrder(body) {
     const url = process.env.GILROSE_API_URL;
@@ -13,6 +14,7 @@ async function createOrder(body) {
     if (!customer.email?.trim()) missingFields.push("customer.email");
     if (missingFields.length > 0) {
         console.warn("[createOrder] customer 信息缺失", {
+            time: getNZLogTime(),
             orderName: body.name,
             missingFields
         });
@@ -72,7 +74,7 @@ async function createOrder(body) {
             data: resData
         };
     } catch (error) {
-        console.error("[createOrder] 请求失败", {
+        console.error(`[${getNZLogTime()}] [createOrder] 请求失败`, {
             orderName: body.name,
             message: error.message,
             stack: error.stack

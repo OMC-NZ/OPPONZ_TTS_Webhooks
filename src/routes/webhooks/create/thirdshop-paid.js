@@ -44,7 +44,7 @@ router.post("/", async (req, res) => {           // Buffer
     // 可选：健壮性提示
     const topic = req.get("X-Shopify-Topic");
     if (topic && topic !== "orders/create") {
-        console.warn(`[提示] X-Shopify-Topic=${topic}, 但路由为 /orders/create`);
+        console.warn(`[${ts}] [提示] X-Shopify-Topic=${topic}, 但路由为 /orders/create`);
     }
 
     let order;
@@ -69,7 +69,7 @@ router.post("/", async (req, res) => {           // Buffer
 
                 ceva_oos(data)
                     .then(() => console.log(`[${ts}] ceva_oos email sent`))
-                    .catch((err) => console.error("ceva_oos error:", err));
+                    .catch((err) => console.error(`[${ts}] ceva_oos error:`, err));
 
                 return;
             }

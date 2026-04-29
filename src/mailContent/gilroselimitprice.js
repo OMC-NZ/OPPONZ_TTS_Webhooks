@@ -1,9 +1,10 @@
 const { sendMail } = require("../utils/sendMail");
+const { getNZLogTime } = require("../utils/timeUtils");
 
 async function gilroselimitprice(order) {
   const email = order?.customer?.email;
   if (!email) {
-    console.warn("gilroselimitprice: 缺少 customer.email, 跳过发送。");
+    console.warn(`[${getNZLogTime()}] gilroselimitprice: 缺少 customer.email, 跳过发送。`);
     return;
   }
 

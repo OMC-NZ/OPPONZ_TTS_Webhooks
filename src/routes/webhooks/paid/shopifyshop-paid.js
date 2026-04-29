@@ -3,13 +3,14 @@ const { saveRawJSON } = require("../../../utils/files");
 const hmacVerify = require("../../../middleware/hmacVerify");
 const caveCreateOrder = require("../../../ceva/createOrder");
 const { ceva_oos } = require("../../../mailContent/ceva_oos");
+const { getNZLogTime } = require("../../../utils/timeUtils");
 
 const router = express.Router();
 const RAW_LIMIT = process.env.WEBHOOK_RAW_LIMIT || "5mb";
 const SECRET = process.env.TTS_WEBHOOK_SECRET || "";
 const ALLOW_UNVERIFIED = /^(1|true|yes)$/i.test((process.env.ALLOW_UNVERIFIED || "").trim());
 if (!SECRET && !ALLOW_UNVERIFIED) {
-    console.warn("⚠️ WARNING: TTS_WEBHOOK_SECRET is not set! Incoming webhooks will be rejected unless ALLOW_UNVERIFIED=1.");
+    console.warn(`[${getNZLogTime()}] ⚠️ WARNING: TTS_WEBHOOK_SECRET is not set! Incoming webhooks will be rejected unless ALLOW_UNVERIFIED=1.`);
 }
 
 // 仅此路由树使用 raw (必须在任何 json() 之前)
@@ -44,7 +45,7 @@ router.post("/", async (req, res) => {
     // 可选：健壮性提示 (测试负载有时不匹配主题)
     const topic = req.get("X-Shopify-Topic");
     if (topic && topic !== "orders/paid") {
-        console.warn(`[提示] X-Shopify-Topic=${topic}, 但路由为 /orders/paid`);
+        console.warn(`[${ts}] [提示] X-Shopify-Topic=${topic}, 但路由为 /orders/paid`);
     }
 
     let order;
