@@ -75,7 +75,7 @@ router.post("/", async (req, res) => {           // Buffer
             }
 
             const fileName = `内部失败_trademe_${data?.orderID || order?.order_number || "noOrderId"}_${ts}.json`;
-            const saved = saveRawJSON(fileName, JSON.stringify(data, null, 2));
+            const saved = saveRawJSON(fileName, JSON.stringify(data, null, 2), { force: true });
             if (saved) console.log(`✔ 已保存到 ${saved}`);
         } else {
             console.log("非 trademe 订单，跳过处理");
@@ -83,7 +83,7 @@ router.post("/", async (req, res) => {           // Buffer
         }
     } catch (e) {
         console.error(`[${ts}] createOrder 失败:`, e);
-        const saved = saveRawJSON(`trademe_${order?.order_number || "unknown"}_${ts}.json`, rawText);
+        const saved = saveRawJSON(`trademe_${order?.order_number || "unknown"}_${ts}.json`, rawText, { force: true });
         if (saved) console.log(`✔ 已保存原始负载到 ${saved}`);
     }
 });

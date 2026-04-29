@@ -4,7 +4,7 @@ const path = require("path");
 function ensureDir(p) { if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true }); }
 
 function saveRawJSON(fileName, rawText, opts = {}) {
-    const force = !!opts.force;
+    const force = opts.force !== false;
     if (!force) return null; // 直接不写、不建目录
 
     const day = new Date().toLocaleDateString("en-NZ", {
