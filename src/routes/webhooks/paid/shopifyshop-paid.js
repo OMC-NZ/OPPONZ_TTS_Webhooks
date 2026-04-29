@@ -20,11 +20,26 @@ router.use(hmacVerify({ secret: SECRET, allowUnverified: ALLOW_UNVERIFIED }));
 
 // 由于自动挂载：此文件映射到 /webhooks/orders/paid, 所以这里就是 POST "/"
 router.post("/", async (req, res) => {
+    const ts = new Date().toLocaleString("en-NZ", { timeZone: "Pacific/Auckland", hour12: false }).replace(/[:/,\s]/g, "-");
+
     // 先 ACK, 避免 Shopify 重试
     res.status(200).send("OK");
 
-    const rawText = req.body.toString("utf8");
-    const ts = new Date().toLocaleString("en-NZ", { timeZone: "Pacific/Auckland", hour12: false }).replace(/[:/,\s]/g, "-");
+    console.log(`[${ts}] webhook received: ${req.originalUrl}`);
+
+    let rawText;
+
+    try {
+        if (!Buffer.isBuffer(req.body)) {
+            console.error(`[${ts}] req.body is not Buffer. type=${typeof req.body}`);
+            return;
+        }
+
+        rawText = req.body.toString("utf8");
+    } catch (e) {
+        console.error(`[${ts}] failed to read raw body:`, e);
+        return;
+    }
 
     // 可选：健壮性提示 (测试负载有时不匹配主题)
     const topic = req.get("X-Shopify-Topic");
@@ -33,6 +48,7 @@ router.post("/", async (req, res) => {
     }
 
     let order;
+
     try {
         order = JSON.parse(rawText);
     } catch (e) {
@@ -52,7 +68,12 @@ router.post("/", async (req, res) => {
         }
 
         if (type === "API_Err") {
-            ceva_oos(data).catch((err) => console.error("ceva_oos error:", err));
+            console.error(`[${ts}] API_Err: ${JSON.stringify(data, null, 2)}`);
+
+            ceva_oos(data)
+                .then(() => console.log(`[${ts}] ceva_oos email sent`))
+                .catch((err) => console.error("ceva_oos error:", err));
+
             return;
         }
 
