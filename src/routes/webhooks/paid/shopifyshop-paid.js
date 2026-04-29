@@ -81,7 +81,7 @@ router.post("/", async (req, res) => {
         const saved = saveRawJSON(fileName, JSON.stringify(data, null, 2));
         if (saved) console.log(`✔ 已保存到 ${saved}`);
     } catch (e) {
-        console.error("createOrder 失败:", e);
+        console.error(`[${ts}] createOrder 失败:`, e);
         const saved = saveRawJSON(`createOrderError_${order?.order_number || "unknown"}_${ts}.json`, rawText);
         if (saved) console.log(`✔ 已保存原始负载到 ${saved}`);
     }

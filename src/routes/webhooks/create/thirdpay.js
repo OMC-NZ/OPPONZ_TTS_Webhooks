@@ -4,6 +4,7 @@ const hmacVerify = require("../../../middleware/hmacVerify");
 const createOrder = require("../../../gilrose/createOrder");
 const { gilroselimitprice } = require("../../../mailContent/gilroselimitprice");
 const { sendMail } = require("../../../utils/sendMail");
+const { getNZLogTime } = require("../../../utils/timeUtils");
 
 const router = express.Router();
 const RAW_LIMIT = process.env.WEBHOOK_RAW_LIMIT || "5mb";
@@ -53,6 +54,7 @@ router.post("/", async (req, res) => {  // Buffer format
             const result = await createOrder(order);
             if (!result.success) {
                 console.warn("[createOrder 失败]", {
+                    time: getNZLogTime(),
                     orderName: order.name,
                     code: result.code,
                     message: result.message
