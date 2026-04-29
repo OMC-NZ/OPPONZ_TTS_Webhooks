@@ -52,7 +52,7 @@ router.post("/", async (req, res) => {
     try {
         order = JSON.parse(rawText);
     } catch (e) {
-        console.error("JSON parse failed:", e);
+        console.error(`[${ts}] JSON parse failed:`, e);
         const saved = saveRawJSON(`orderError_${Date.now()}.json`, rawText);
         if (saved) console.log(`✔ 已保存原始负载到 ${saved}`);
         return;
@@ -72,7 +72,7 @@ router.post("/", async (req, res) => {
 
             ceva_oos(data)
                 .then(() => console.log(`[${ts}] ceva_oos email sent`))
-                .catch((err) => console.error("ceva_oos error:", err));
+                .catch((err) => console.error(`[${ts}] ceva_oos error:`, err));
 
             return;
         }
