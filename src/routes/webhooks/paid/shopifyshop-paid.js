@@ -65,7 +65,7 @@ router.post("/", async (req, res) => {
             shipTo: "2086823"
         },
         "myfirst-nz": {
-            name: "MFNZ",
+            name: "MF",
             billTo: "2087400",
             shipTo: "2087401"
         },
