@@ -1,3 +1,4 @@
+// 订单被创建且未支付, 其支付方式选择了第三方支付（如 Gilrose）
 const express = require("express");
 require("dotenv").config();
 const hmacVerify = require("../../../middleware/hmacVerify");
@@ -8,14 +9,17 @@ const { getNZLogTime } = require("../../../utils/timeUtils");
 
 const router = express.Router();
 const RAW_LIMIT = process.env.WEBHOOK_RAW_LIMIT || "5mb";
-const SECRET = process.env.OPPOSTORE_WEBHOOK_SECRET || "";
+
+const OPPOSTORE_SECRET = process.env.OPPOSTORE_WEBHOOK_SECRET || "";
+const WEBHOOK_SECRETS = [OPPOSTORE_SECRET].filter(Boolean);
+
 const ALLOW_UNVERIFIED = /^(1|true|yes)$/i.test((process.env.ALLOW_UNVERIFIED || "").trim());
 
 // 仅此路由树使用 raw (必须在任何 json() 之前)
 router.use(express.raw({ type: "application/json", limit: RAW_LIMIT }));
 
 // HMAC 验签 (基于原始字节)
-router.use(hmacVerify({ secret: SECRET, allowUnverified: ALLOW_UNVERIFIED }));
+router.use(hmacVerify({ secrets: WEBHOOK_SECRETS, allowUnverified: ALLOW_UNVERIFIED }));
 
 // 由于自动挂载：此文件映射到 /webhooks/orders/create, 所以这里就是 POST "/"
 router.post("/", async (req, res) => {  // Buffer format

@@ -1,6 +1,6 @@
-// 开始是为了trademe支付的订单，由于来自trademe的这类订单被创建在shopify中时已是已支付的状态，
-// 所以它并不会被shopify的Paid事件所捕获，也就不会触发“Order Paid”事件。
-// 因此只能通过“Order Created”事件来捕捉这类订单。
+// 订单被创建于第三方网店(如 trademe)，这类订单被创建时是已支付的状态，
+// 所以它不会被 shopify 的 “Order Paid” 事件捕获，
+// 因此只能通过 “Order Created” 事件来捕捉这类订单。
 const express = require("express");
 const hmacVerify = require("../../../middleware/hmacVerify");
 const { saveRawJSON } = require("../../../utils/files");
@@ -9,14 +9,15 @@ const { ceva_oos } = require("../../../mailContent/ceva_oos");
 
 const router = express.Router();
 const RAW_LIMIT = process.env.WEBHOOK_RAW_LIMIT || "5mb";
-const SECRET = process.env.TTS_WEBHOOK_SECRET || "";
+const TTS_SECRET = process.env.TTS_WEBHOOK_SECRET || "";
+const WEBHOOK_SECRETS = [TTS_SECRET].filter(Boolean);
 const ALLOW_UNVERIFIED = /^(1|true|yes)$/i.test((process.env.ALLOW_UNVERIFIED || "").trim());
 
 // 仅此路由树使用 raw (必须在任何 json() 之前)
 router.use(express.raw({ type: "application/json", limit: RAW_LIMIT }));
 
 // HMAC 验签 (基于原始字节)
-router.use(hmacVerify({ secret: SECRET, allowUnverified: ALLOW_UNVERIFIED }));
+router.use(hmacVerify({ secrets: WEBHOOK_SECRETS, allowUnverified: ALLOW_UNVERIFIED }));
 
 // 由于自动挂载：此文件映射到 /webhooks/orders/create, 所以这里就是 POST "/"
 router.post("/", async (req, res) => {           // Buffer

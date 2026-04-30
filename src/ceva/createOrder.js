@@ -34,24 +34,24 @@ function normalizeLineDetails(input) {
     }, []);
 }
 
-async function createOrder(body) {
+async function createOrder(shopShort, body) {
     const url = process.env.CEVA_ORDER_URL;
     const token = await getCEVAToken();
     const lineDetails = normalizeLineDetails(body.line_items);
     // 如果过滤后没东西，直接返回，不去调 CEVA
     if (lineDetails.length === 0) {
-        console.log(`TTS ${body.name}没有可供CEVA发货的商品`);
-        return { skipped: true, message: `TTS ${body.name} has no items available for CEVA to ship` };
+        console.log(`${shopShort.name} ${body.name}没有可供CEVA发货的商品`);
+        return { skipped: true, message: `${shopShort.name} ${body.name} has no items available for CEVA to ship` };
     }
 
     const payload = {
         "senderId": "OPPONZ",
-        "orderID": "TTS" + body.name,
+        "orderID": shopShort.name + body.name,
         "action": "create",
         "tpid": "BPNZJDE",
         "tpid_version": "ORCH001",
-        "billTo": "2086822",
-        "shipTo": "2086823",
+        "billTo": shopShort.billTo,
+        "shipTo": shopShort.shipTo,
         "requestedDate": toLocalISOStringWithoutTZ(body.created_at),
         "poRecyclingPeriodInMonths": 99999,
         "shippingAddress": {
