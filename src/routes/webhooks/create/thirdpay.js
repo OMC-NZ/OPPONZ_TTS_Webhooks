@@ -79,7 +79,7 @@ router.post("/", async (req, res) => {  // Buffer format
                 `;
 
                 try {
-                    await sendMail({ to: process.env.ADMIN_EMAIL, subject, html, key: "ONLINEOPPO" });
+                    await sendMail({ to: process.env.DEVE_EMAIL, subject, html, key: "ONLINEOPPO" });
                 } catch (mailError) {
                     console.error("[sendMail 失败]", {
                         time: getNZLogTime(),

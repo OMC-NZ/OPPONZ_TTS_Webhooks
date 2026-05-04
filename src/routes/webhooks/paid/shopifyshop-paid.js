@@ -1,10 +1,12 @@
 // 在 Shopify 中成功支付的订单来到这里。
 const express = require("express");
+require("dotenv").config();
 const { saveRawJSON } = require("../../../utils/files");
 const hmacVerify = require("../../../middleware/hmacVerify");
 const caveCreateOrder = require("../../../ceva/createOrder");
 const { ceva_oos } = require("../../../mailContent/ceva_oos");
 const { getNZLogTime } = require("../../../utils/timeUtils");
+const { sendMail } = require("../../../utils/sendMail");
 
 const router = express.Router();
 const RAW_LIMIT = process.env.WEBHOOK_RAW_LIMIT || "5mb";
@@ -111,9 +113,11 @@ router.post("/", async (req, res) => {
         const saved = saveRawJSON(fileName, JSON.stringify(data, null, 2));
         if (saved) console.log(`✔ 已保存到 ${saved}`);
     } catch (e) {
-        console.error(`[${ts}] createOrder 失败:`, e);
+        console.error(`[${ts}] ${order.name} createOrder `, e);
+        const sendMail = await sendMail({ to: process.env.DEVE_EMAIL, subject: 'Order Creation Failed', html: e, key: 'ONLINEKONEC' });
+
         const saved = saveRawJSON(`createOrderError_${order?.order_number || "unknown"}_${ts}.json`, rawText);
-        if (saved) console.log(`✔ 已保存原始负载到 ${saved}`);
+        if (saved) console.log(`已保存原始负载到 .pm2/logs/TTS-Webhooks-error.log`);
     }
 });
 

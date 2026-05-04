@@ -2,10 +2,12 @@
 // 所以它不会被 shopify 的 “Order Paid” 事件捕获，
 // 因此只能通过 “Order Created” 事件来捕捉这类订单。
 const express = require("express");
+require("dotenv").config();
 const hmacVerify = require("../../../middleware/hmacVerify");
 const { saveRawJSON } = require("../../../utils/files");
 const caveCreateOrder = require("../../../ceva/createOrder");
 const { ceva_oos } = require("../../../mailContent/ceva_oos");
+const { sendMail } = require("../../../utils/sendMail");
 
 const router = express.Router();
 const RAW_LIMIT = process.env.WEBHOOK_RAW_LIMIT || "5mb";
@@ -48,6 +50,27 @@ router.post("/", async (req, res) => {           // Buffer
         console.warn(`[${ts}] [提示] X-Shopify-Topic=${topic}, 但路由为 /orders/create`);
     }
 
+    const shopDomain = req.get("X-Shopify-Shop-Domain");
+    const shopName = shopDomain.replace(".myshopify.com", "");
+    const shopShortNameMap = {
+        "thetechnologystorenz": {
+            name: "TTS",
+            billTo: "2086822",
+            shipTo: "2086823"
+        },
+        "myfirst-nz": {
+            name: "MF",
+            billTo: "2087400",
+            shipTo: "2087401"
+        },
+    };
+    const shopShort = shopShortNameMap[shopName];
+
+    if (!shopShort) {
+        console.error(`[${ts}] 未识别的 Shopify 店铺: ${shopName}`);
+        return;
+    }
+
     let order;
 
     try {
@@ -57,7 +80,7 @@ router.post("/", async (req, res) => {           // Buffer
 
         if (/\btrademe\b/i.test(tagsText)) {
             console.log("触发 trademe 订单处理逻辑");
-            const data = await caveCreateOrder(order);
+            const data = await caveCreateOrder(shopShort, order);
             const type = data?.errorWarnings?.[0]?.errorType;
 
             if (type === "API_Warning") {
@@ -83,7 +106,9 @@ router.post("/", async (req, res) => {           // Buffer
             return;
         }
     } catch (e) {
-        console.error(`[${ts}] createOrder 失败:`, e);
+        console.error(`[${ts}] ${order.name} createOrder `, e);
+        const sendMail = await sendMail({ to: process.env.DEVE_EMAIL, subject: 'Order Creation Failed', html: e, key: 'ONLINEKONEC' });
+
         const saved = saveRawJSON(`trademe_${order?.order_number || "unknown"}_${ts}.json`, rawText, { force: true });
         if (saved) console.log(`✔ 已保存原始负载到 ${saved}`);
     }

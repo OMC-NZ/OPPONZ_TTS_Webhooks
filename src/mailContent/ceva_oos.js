@@ -1,9 +1,10 @@
+require("dotenv").config();
 const { sendMail } = require("../utils/sendMail");
 const { getNZLogTime } = require("../utils/timeUtils");
 
 const ceva_oos = async (order) => {
-    const toEmail = "nz.dev@oppomobile.nz"; //"nz.dev@oppomobile.nz; Lisa.Naidoo@oppomobile.nz;";
-    const toCC = "nz.dev@oppomobile.nz";
+    const toEmail = process.env.DEVE_EMAIL;
+    const toCC = "";
     const subject = `noreply-TTS Order ${order.orderID} Errors`;
     const html = `
                 <div>
