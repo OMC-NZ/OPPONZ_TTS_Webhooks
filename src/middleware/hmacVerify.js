@@ -1,3 +1,5 @@
+require("dotenv").config();
+const { sendMail } = require("../utils/sendMail");
 const crypto = require("crypto");
 const { getNZLogTime } = require("../utils/timeUtils");
 
@@ -54,13 +56,14 @@ module.exports = function hmacVerify({ secret, secrets, allowUnverified = false 
         });
 
         if (!matched) {
-            console.error(`[${getNZLogTime()}] ✖ HMAC 验签失败。header =`, sigHeader);
+            const message = `[${getNZLogTime()}] HMAC 验签失败。header = ${sigHeader}`;
 
             if (!allowUnverified) {
+                console.error(`${message}`);
                 return res.status(401).send("Invalid HMAC");
             }
 
-            console.warn(`[${getNZLogTime()}] ALLOW_UNVERIFIED 已开启，虽然验签失败但继续放行。`);
+            console.warn(`${message}。ALLOW_UNVERIFIED 已开启，继续放行。`);
         }
 
         next();

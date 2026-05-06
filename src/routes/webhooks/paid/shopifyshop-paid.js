@@ -76,6 +76,18 @@ router.post("/", async (req, res) => {
 
     if (!shopShort) {
         console.error(`[${ts}] 未识别的 Shopify 店铺: ${shopName}`);
+
+        try {
+            await sendMail({
+                to: process.env.DEVE_EMAIL,
+                subject: `[Webhook] Unrecognized Shopify Shop ${shopName}`,
+                text: `Received a webhook from an unrecognized shop domain: ${shopDomain}. Please check the logs for details.`,
+                key: 'ONLINEKONEC'
+            });
+        } catch (mailErr) {
+            console.error(`[${ts}] Failed to send unrecognized shop notification email:`, mailErr);
+        }
+
         return;
     }
 
@@ -85,6 +97,18 @@ router.post("/", async (req, res) => {
         order = JSON.parse(rawText);
     } catch (e) {
         console.error(`[${ts}] JSON parse failed:`, e);
+
+        try {
+            await sendMail({
+                to: process.env.DEVE_EMAIL,
+                subject: `[Webhook] JSON Parse Failed for Paid Order from ${shopShort.name}`,
+                text: `Error Logs was saved at '/home/nzdev/.pm2/logs/TTS-Webhooks-error'.`,
+                key: 'ONLINEKONEC'
+            });
+        } catch (mailErr) {
+            console.error(`[${ts}] Failed to send error notification email:`, mailErr);
+        }
+
         const saved = saveRawJSON(`orderError_${Date.now()}.json`, rawText);
         if (saved) console.log(`✔ 已保存原始负载到 ${saved}`);
         return;
@@ -114,7 +138,17 @@ router.post("/", async (req, res) => {
         if (saved) console.log(`✔ 已保存到 ${saved}`);
     } catch (e) {
         console.error(`[${ts}] ${order.name} createOrder `, e);
-        const sendMail = await sendMail({ to: process.env.DEVE_EMAIL, subject: 'Order Creation Failed', html: e, key: 'ONLINEKONEC' });
+
+        try {
+            await sendMail({
+                to: process.env.DEVE_EMAIL,
+                subject: `${order.name} Order Creation Failed`,
+                html: e,
+                key: 'ONLINEKONEC'
+            });
+        } catch (mailErr) {
+            console.error(`[${ts}] Failed to send error notification email:`, mailErr);
+        }
 
         const saved = saveRawJSON(`createOrderError_${order?.order_number || "unknown"}_${ts}.json`, rawText);
         if (saved) console.log(`已保存原始负载到 .pm2/logs/TTS-Webhooks-error.log`);

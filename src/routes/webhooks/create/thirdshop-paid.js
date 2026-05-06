@@ -35,12 +35,36 @@ router.post("/", async (req, res) => {           // Buffer
     try {
         if (!Buffer.isBuffer(req.body)) {
             console.error(`[${ts}] req.body is not Buffer. type=${typeof req.body}`);
+
+            try {
+                await sendMail({
+                    to: process.env.DEVE_EMAIL,
+                    subject: `[Webhook] Invalid Body Type for Third-Party Payment Order`,
+                    text: `Error Logs was saved at '/home/nzdev/.pm2/logs/OPPONZ-TTS-Webhooks-error'.`,
+                    key: 'ONLINEKONEC'
+                });
+            } catch (mailErr) {
+                console.error(`[${ts}] Failed to send error notification email:`, mailErr);
+            }
+
             return;
         }
 
         rawText = req.body.toString("utf8");
     } catch (e) {
         console.error(`[${ts}] failed to read raw body:`, e);
+
+        try {
+            await sendMail({
+                to: process.env.DEVE_EMAIL,
+                subject: `[Webhook] Failed to Read Raw Body for Third-Party Payment Order`,
+                text: `Error Logs was saved at '/home/nzdev/.pm2/logs/OPPONZ-TTS-Webhooks-error'.`,
+                key: 'ONLINEKONEC'
+            });
+        } catch (mailErr) {
+            console.error(`[${ts}] Failed to send error notification email:`, mailErr);
+        };
+
         return;
     }
 
@@ -68,6 +92,18 @@ router.post("/", async (req, res) => {           // Buffer
 
     if (!shopShort) {
         console.error(`[${ts}] 未识别的 Shopify 店铺: ${shopName}`);
+
+        try {
+            await sendMail({
+                to: process.env.DEVE_EMAIL,
+                subject: `[Webhook] Unrecognized Shopify Store: ${shopName}`,
+                text: `Error Logs was saved at '/home/nzdev/.pm2/logs/OPPONZ-TTS-Webhooks-error'.`,
+                key: 'ONLINEKONEC'
+            });
+        } catch (mailErr) {
+            console.error(`[${ts}] Failed to send error notification email:`, mailErr);
+        }
+
         return;
     }
 
@@ -92,8 +128,11 @@ router.post("/", async (req, res) => {           // Buffer
                 console.error(`[${ts}] API_Err: ${JSON.stringify(data, null, 2)}`);
 
                 ceva_oos(data)
-                    .then(() => console.log(`[${ts}] ceva_oos email sent`))
-                    .catch((err) => console.error(`[${ts}] ceva_oos error:`, err));
+                    .then(() => {
+                        console.log(`[${ts}] ceva_oos email sent`)
+                    }).catch((err) => {
+                        console.error(`[${ts}] ceva_oos error:`, err)
+                    });
 
                 return;
             }
@@ -107,7 +146,17 @@ router.post("/", async (req, res) => {           // Buffer
         }
     } catch (e) {
         console.error(`[${ts}] ${order.name} createOrder `, e);
-        const sendMail = await sendMail({ to: process.env.DEVE_EMAIL, subject: 'Order Creation Failed', html: e, key: 'ONLINEKONEC' });
+
+        try {
+            await sendMail({
+                to: process.env.DEVE_EMAIL,
+                subject: 'Order Creation Failed',
+                html: e,
+                key: 'ONLINEKONEC'
+            });
+        } catch (mailErr) {
+            console.error(`[${ts}] Failed to send error notification email:`, mailErr);
+        }
 
         const saved = saveRawJSON(`trademe_${order?.order_number || "unknown"}_${ts}.json`, rawText, { force: true });
         if (saved) console.log(`✔ 已保存原始负载到 ${saved}`);

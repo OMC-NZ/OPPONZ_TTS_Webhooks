@@ -44,6 +44,18 @@ router.post("/", async (req, res) => {  // Buffer format
         });
     } catch (e) {
         console.error(`[${getNZLogTime()}] JSON parse failed:`, e);
+
+        try {
+            await sendMail({
+                to: process.env.DEVE_EMAIL,
+                subject: `[Webhook] JSON Parse Failed for Third-Party Payment Order ${order.name}`,
+                text: `Error Logs was saved at '/home/nzdev/.pm2/logs/OPPONZ-TTS-Webhooks-error'.`,
+                key: 'ONLINEKONEC'
+            });
+        } catch (mailErr) {
+            console.error(`[${getNZLogTime()}] Failed to send error notification email:`, mailErr);
+        }
+
         return;
     }
 
@@ -87,6 +99,17 @@ router.post("/", async (req, res) => {  // Buffer format
                         message: mailError?.message,
                         stack: mailError?.stack
                     });
+
+                    try {
+                        await sendMail({
+                            to: process.env.DEVE_EMAIL,
+                            subject: `[sendMail Failed] ${subject}`,
+                            text: `Error Logs was saved at '/home/nzdev/.pm2/logs/OPPONZ-TTS-Webhooks-error'.`,
+                            key: 'ONLINEKONEC'
+                        });
+                    } catch (mailErr) {
+                        console.error(`[${getNZLogTime()}] Failed to send error notification email:`, mailErr);
+                    }
                 }
                 return;
             }
@@ -102,6 +125,17 @@ router.post("/", async (req, res) => {  // Buffer format
             message: e?.message,
             stack: e?.stack
         });
+
+        try {
+            await sendMail({
+                to: process.env.DEVE_EMAIL,
+                subject: `[Error] Processing Third-Party Payment Order ${order.name} Failed`,
+                text: `Error Logs was saved at '/home/nzdev/.pm2/logs/OPPONZ-TTS-Webhooks-error'.`,
+                key: 'ONLINEKONEC'
+            });
+        } catch (mailErr) {
+            console.error(`[${getNZLogTime()}] Failed to send error notification email:`, mailErr);
+        }
     }
 });
 

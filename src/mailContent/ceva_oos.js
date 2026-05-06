@@ -18,10 +18,28 @@ const ceva_oos = async (order) => {
                 </div>`;
 
     try {
-        const info = await sendMail({ to: toEmail, subject, html, key: 'ONLINEKONEC' });
+        const info = await sendMail({
+            to: toEmail,
+            subject: subject,
+            html: html,
+            key: 'ONLINEKONEC'
+        });
         // console.log("noreply-TTS Order sending successfully:", info);
     } catch (err) {
-        console.error(`[${getNZLogTime()}] noreply-TTS Order sending failed:`, err);
+        console.error(`[${getNZLogTime()}] TTS Order sending failed:`, err);
+
+        try {
+            await sendMail({
+                to: process.env.DEVE_EMAIL,
+                subject: `Noreply-TTS Order sending failed ${order.orderID}`,
+                text: `Error log was saved at '/home/nzdev/.pm2/logs/OPPONZ-TTS-Webhooks-error.log'.`,
+                key: "ONLINEKONEC"
+            });
+        } catch (mailErr) {
+            console.error(`[${getNZLogTime()}] Failed to send error notification email:`, mailErr);
+        }
+
+        throw err;
     }
 };
 

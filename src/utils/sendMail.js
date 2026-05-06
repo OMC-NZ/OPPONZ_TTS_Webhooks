@@ -1,7 +1,7 @@
 const nodemailer = require("nodemailer");
 
 /** 发邮件 */
-async function sendMail({ to, cc, bcc, subject, html, text, key = "" }) {
+async function sendMail({ to, cc, bcc, subject, text, html, key = "" }) {
     const upperKey = key.toUpperCase(); // 确保兼容小写参数
     const user = process.env[`SMTP_USER_${upperKey}`];
     const pass = process.env[`SMTP_PASS_${upperKey}`];

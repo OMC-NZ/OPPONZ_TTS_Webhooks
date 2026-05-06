@@ -1,6 +1,7 @@
 require("dotenv").config();
 const { postJSONWithRetries } = require("../utils/postJSONWithRetries");
 const { getNZLogTime } = require("../utils/timeUtils");
+const { sendMail } = require("../utils/sendMail");
 
 async function createOrder(body) {
     const url = process.env.GILROSE_API_URL;
@@ -17,6 +18,13 @@ async function createOrder(body) {
             time: getNZLogTime(),
             orderName: body.name,
             missingFields
+        });
+
+        await sendMail({
+            to: process.env.DEVE_EMAIL,
+            subject: "Customer Information Missing",
+            text: `Order ${body.name} is missing customer information: ${missingFields.join(", ")}`,
+            key: 'ONLINEKONEC'
         });
 
         return {
@@ -79,6 +87,18 @@ async function createOrder(body) {
             message: error.message,
             stack: error.stack
         });
+
+        try {
+            await sendMail({
+                to: process.env.DEVE_EMAIL,
+                subject: `createOrder Request Failed for Order ${body.name}`,
+                text: `Failed to send order ${body.name} to Gilrose. Error Logs was saved at '/home/nzdev/.pm2/logs/OPPONZ-TTS-Webhooks-error'.`,
+                key: 'ONLINEKONEC'
+            });
+        } catch (mailErr) {
+            console.error(`[${getNZLogTime()}] Failed to send error notification email:`, mailErr);
+        }
+
         return {
             success: false,
             code: "REQUEST_FAILED",
