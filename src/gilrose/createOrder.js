@@ -6,13 +6,35 @@ const { sendMail } = require("../utils/sendMail");
 async function createOrder(body) {
     const url = process.env.GILROSE_API_URL;
     const hmacKey = process.env.GILROSE_HMACKEY;
+    const devEmail = process.env.DEVE_EMAIL?.trim();
+
+    const sendDevMail = async ({ subject, text }) => {
+        if (!devEmail) {
+            console.error(`[${getNZLogTime()}] [createOrder] DEVE_EMAIL 未配置，无法发送通知邮件`, {
+                orderName: body.name,
+                subject
+            });
+            return;
+        }
+
+        await sendMail({
+            to: devEmail,
+            subject,
+            text,
+            key: 'ONLINEKONEC'
+        });
+    };
 
     // 由于Shop Pay账户可能存在信息不完整的情况，故在这里需要进行额外的健壮性验证，确保传输完整性。
-    const customer = body.customer;
+    const customer = body.customer || {};
+    const firstName = customer.first_name?.trim();
+    const lastName = customer.last_name?.trim() || firstName;
+    const email = customer.email?.trim();
+    const phone = customer.phone?.trim() || "64000000000"; // Shopify 可能返回空字符串，Gilrose 要求非空，所以用一个默认值占位
+
     const missingFields = [];
-    if (!customer.first_name?.trim()) missingFields.push("customer.first_name");
-    if (!customer.last_name?.trim()) missingFields.push("customer.last_name");
-    if (!customer.email?.trim()) missingFields.push("customer.email");
+    if (!firstName) missingFields.push("customer.first_name");
+    if (!email) missingFields.push("customer.email");
     if (missingFields.length > 0) {
         console.warn("[createOrder] customer 信息缺失", {
             time: getNZLogTime(),
@@ -20,11 +42,9 @@ async function createOrder(body) {
             missingFields
         });
 
-        await sendMail({
-            to: process.env.DEVE_EMAIL,
+        await sendDevMail({
             subject: "Customer Information Missing",
-            text: `Order ${body.name} is missing customer information: ${missingFields.join(", ")}`,
-            key: 'ONLINEKONEC'
+            text: `Order ${body.name} is missing customer information: ${missingFields.join(", ")}`
         });
 
         return {
@@ -40,10 +60,10 @@ async function createOrder(body) {
         "storeName": "OPPO NZ",
         "storeNumber": "D6468",
         "customer": {
-            "firstName": customer.first_name,
-            "lastName": customer.last_name,
-            "email": customer.email,
-            "phone": customer.phone ?? "64000000000" // Shopify 可能返回空字符串，Gilrose 要求非空，所以用一个默认值占位
+            "firstName": firstName,
+            "lastName": lastName,
+            "email": email,
+            "phone": phone
         },
         "purchaseDate": body.created_at,
         "eventId": body.id,
@@ -89,11 +109,9 @@ async function createOrder(body) {
         });
 
         try {
-            await sendMail({
-                to: process.env.DEVE_EMAIL,
+            await sendDevMail({
                 subject: `createOrder Request Failed for Order ${body.name}`,
-                text: `Failed to send order ${body.name} to Gilrose. Error Logs was saved at '/home/nzdev/.pm2/logs/OPPONZ-TTS-Webhooks-error'.`,
-                key: 'ONLINEKONEC'
+                text: `Failed to send order ${body.name} to Gilrose. Error Logs was saved at '/home/nzdev/.pm2/logs/OPPONZ-TTS-Webhooks-error'.`
             });
         } catch (mailErr) {
             console.error(`[${getNZLogTime()}] Failed to send error notification email:`, mailErr);

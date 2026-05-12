@@ -11,6 +11,14 @@ async function sendMail({ to, cc, bcc, subject, text, html, key = "" }) {
 
     if (!from) throw new Error("FROM_EMAIL/SMTP_USER 未配置");
 
+    const hasRecipient = (recipient) => {
+        if (Array.isArray(recipient)) return recipient.some((item) => item?.trim());
+        return Boolean(recipient?.trim());
+    };
+
+    if (![to, cc, bcc].some(hasRecipient)) {
+        throw new Error("邮件收件人未配置：请提供 to、cc 或 bcc");
+    }
 
     const transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST,
