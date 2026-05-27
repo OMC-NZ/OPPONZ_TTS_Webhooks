@@ -32,11 +32,11 @@ const ceva_oos = async (order) => {
             await sendMail({
                 to: process.env.DEVE_EMAIL,
                 subject: `Noreply-TTS Order sending failed ${order.orderID}`,
-                text: `Error log was saved at '/home/nzdev/.pm2/logs/OPPONZ-TTS-Webhooks-error.log'.`,
+                text: `Error log was saved at 'logs/errors/OPPONZ-TTS-Webhooks-error.log'.`,
                 key: "ONLINEKONEC"
             });
         } catch (mailErr) {
-            console.error(`[${getNZLogTime()}] Failed to send error notification email:`, mailErr);
+            console.error(`[${getNZLogTime()}] Failed to send error notification email.`, mailErr);
         }
 
         throw err;

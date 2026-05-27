@@ -85,7 +85,7 @@ router.post("/", async (req, res) => {
                 key: 'ONLINEKONEC'
             });
         } catch (mailErr) {
-            console.error(`[${ts}] Failed to send unrecognized shop notification email:`, mailErr);
+            console.error(`[${ts}] Failed to send unrecognized shop notification email.`, mailErr);
         }
 
         return;
@@ -102,11 +102,11 @@ router.post("/", async (req, res) => {
             await sendMail({
                 to: process.env.DEVE_EMAIL,
                 subject: `[Webhook] JSON Parse Failed for Paid Order from ${shopShort.name}`,
-                text: `Error Logs was saved at '/home/nzdev/.pm2/logs/TTS-Webhooks-error'.`,
+                text: `Error Logs was saved at 'logs/errors/OPPONZ-TTS-Webhooks-error.log'.`,
                 key: 'ONLINEKONEC'
             });
         } catch (mailErr) {
-            console.error(`[${ts}] Failed to send error notification email:`, mailErr);
+            console.error(`[${ts}] Failed to send error notification email.`, mailErr);
         }
 
         const saved = saveRawJSON(`orderError_${Date.now()}.json`, rawText);
@@ -137,7 +137,7 @@ router.post("/", async (req, res) => {
         const saved = saveRawJSON(fileName, JSON.stringify(data, null, 2));
         if (saved) console.log(`✔ 已保存到 ${saved}`);
     } catch (e) {
-        console.error(`[${ts}] ${order.name} createOrder `, e);
+        console.error(`[${ts}] ${order.name} createOrder`, e);
 
         try {
             await sendMail({
@@ -147,11 +147,11 @@ router.post("/", async (req, res) => {
                 key: 'ONLINEKONEC'
             });
         } catch (mailErr) {
-            console.error(`[${ts}] Failed to send error notification email:`, mailErr);
+            console.error(`[${ts}] Failed to send error notification email.`, mailErr);
         }
 
         const saved = saveRawJSON(`createOrderError_${order?.order_number || "unknown"}_${ts}.json`, rawText);
-        if (saved) console.log(`已保存原始负载到 .pm2/logs/TTS-Webhooks-error.log`);
+        if (saved) console.log(`已保存原始负载到 ${saved}. Error logs: logs/errors/OPPONZ-TTS-Webhooks-error.log`);
     }
 });
 

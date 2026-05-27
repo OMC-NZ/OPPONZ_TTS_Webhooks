@@ -49,11 +49,11 @@ router.post("/", async (req, res) => {  // Buffer format
             await sendMail({
                 to: process.env.DEVE_EMAIL,
                 subject: `[Webhook] JSON Parse Failed for Third-Party Payment Order ${order.name}`,
-                text: `Error Logs was saved at '/home/nzdev/.pm2/logs/OPPONZ-TTS-Webhooks-error'.`,
+                text: `Error Logs was saved at 'logs/errors/OPPONZ-TTS-Webhooks-error.log'.`,
                 key: 'ONLINEKONEC'
             });
         } catch (mailErr) {
-            console.error(`[${getNZLogTime()}] Failed to send error notification email:`, mailErr);
+            console.error(`[${getNZLogTime()}] Failed to send error notification email.`, mailErr);
         }
 
         return;
@@ -104,11 +104,11 @@ router.post("/", async (req, res) => {  // Buffer format
                         await sendMail({
                             to: process.env.DEVE_EMAIL,
                             subject: `[sendMail Failed] ${subject}`,
-                            text: `Error Logs was saved at '/home/nzdev/.pm2/logs/OPPONZ-TTS-Webhooks-error'.`,
+                            text: `Error Logs was saved at 'logs/errors/OPPONZ-TTS-Webhooks-error.log'.`,
                             key: 'ONLINEKONEC'
                         });
                     } catch (mailErr) {
-                        console.error(`[${getNZLogTime()}] Failed to send error notification email:`, mailErr);
+                        console.error(`[${getNZLogTime()}] Failed to send error notification email.`, mailErr);
                     }
                 }
                 return;
@@ -130,11 +130,11 @@ router.post("/", async (req, res) => {  // Buffer format
             await sendMail({
                 to: process.env.DEVE_EMAIL,
                 subject: `[Error] Processing Third-Party Payment Order ${order.name} Failed`,
-                text: `Error Logs was saved at '/home/nzdev/.pm2/logs/OPPONZ-TTS-Webhooks-error'.`,
+                text: `Error Logs was saved at 'logs/errors/OPPONZ-TTS-Webhooks-error.log'.`,
                 key: 'ONLINEKONEC'
             });
         } catch (mailErr) {
-            console.error(`[${getNZLogTime()}] Failed to send error notification email:`, mailErr);
+            console.error(`[${getNZLogTime()}] Failed to send error notification email.`, mailErr);
         }
     }
 });

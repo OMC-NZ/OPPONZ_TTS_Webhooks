@@ -40,11 +40,11 @@ router.post("/", async (req, res) => {           // Buffer
                 await sendMail({
                     to: process.env.DEVE_EMAIL,
                     subject: `[Webhook] Invalid Body Type for Third-Party Payment Order`,
-                    text: `Error Logs was saved at '/home/nzdev/.pm2/logs/OPPONZ-TTS-Webhooks-error'.`,
+                    text: `Error Logs was saved at 'logs/errors/OPPONZ-TTS-Webhooks-error.log'.`,
                     key: 'ONLINEKONEC'
                 });
             } catch (mailErr) {
-                console.error(`[${ts}] Failed to send error notification email:`, mailErr);
+                console.error(`[${ts}] Failed to send error notification email.`, mailErr);
             }
 
             return;
@@ -58,11 +58,11 @@ router.post("/", async (req, res) => {           // Buffer
             await sendMail({
                 to: process.env.DEVE_EMAIL,
                 subject: `[Webhook] Failed to Read Raw Body for Third-Party Payment Order`,
-                text: `Error Logs was saved at '/home/nzdev/.pm2/logs/OPPONZ-TTS-Webhooks-error'.`,
+                text: `Error Logs was saved at 'logs/errors/OPPONZ-TTS-Webhooks-error.log'.`,
                 key: 'ONLINEKONEC'
             });
         } catch (mailErr) {
-            console.error(`[${ts}] Failed to send error notification email:`, mailErr);
+            console.error(`[${ts}] Failed to send error notification email.`, mailErr);
         };
 
         return;
@@ -97,11 +97,11 @@ router.post("/", async (req, res) => {           // Buffer
             await sendMail({
                 to: process.env.DEVE_EMAIL,
                 subject: `[Webhook] Unrecognized Shopify Store: ${shopName}`,
-                text: `Error Logs was saved at '/home/nzdev/.pm2/logs/OPPONZ-TTS-Webhooks-error'.`,
+                text: `Error Logs was saved at 'logs/errors/OPPONZ-TTS-Webhooks-error.log'.`,
                 key: 'ONLINEKONEC'
             });
         } catch (mailErr) {
-            console.error(`[${ts}] Failed to send error notification email:`, mailErr);
+            console.error(`[${ts}] Failed to send error notification email.`, mailErr);
         }
 
         return;
@@ -155,7 +155,7 @@ router.post("/", async (req, res) => {           // Buffer
                 key: 'ONLINEKONEC'
             });
         } catch (mailErr) {
-            console.error(`[${ts}] Failed to send error notification email:`, mailErr);
+            console.error(`[${ts}] Failed to send error notification email.`, mailErr);
         }
 
         const saved = saveRawJSON(`trademe_${order?.order_number || "unknown"}_${ts}.json`, rawText, { force: true });

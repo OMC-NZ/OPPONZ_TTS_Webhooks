@@ -111,10 +111,10 @@ async function createOrder(body) {
         try {
             await sendDevMail({
                 subject: `createOrder Request Failed for Order ${body.name}`,
-                text: `Failed to send order ${body.name} to Gilrose. Error Logs was saved at '/home/nzdev/.pm2/logs/OPPONZ-TTS-Webhooks-error'.`
+                text: `Failed to send order ${body.name} to Gilrose. Error Logs was saved at 'logs/errors/OPPONZ-TTS-Webhooks-error.log'.`
             });
         } catch (mailErr) {
-            console.error(`[${getNZLogTime()}] Failed to send error notification email:`, mailErr);
+            console.error(`[${getNZLogTime()}] Failed to send error notification email.`, mailErr);
         }
 
         return {

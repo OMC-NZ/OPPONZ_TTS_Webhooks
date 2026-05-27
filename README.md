@@ -42,7 +42,11 @@ TTS Shopify Webhook Server (Node/Express)
   - SAVE_PAYLOAD=0               # 1 将原始 Payload 落盘 logs/ 目录
 
 3) 启动
-- npm start 或 node index.js
+- npm run dev 或 node src/index.js
+- PM2 生产启动可使用：pm2 start ecosystem.config.js
+- PM2 标准输出写入：logs/out/OPPONZ-TTS-Webhooks-out.log
+- PM2 错误输出写入：logs/errors/OPPONZ-TTS-Webhooks-error.log
+- 如需迁移旧的 PM2 轮转日志，例如 OPPONZ-TTS-Webhooks-error__2026-05-02.log，执行：npm run migrate:pm2-logs
 - 健康检查：GET /
 
 自动路由挂载说明
@@ -70,6 +74,7 @@ Shopify HMAC 验签与 raw body
 日志与排错
 - LOG_REQUESTS=1 时，requestLogger 将输出：时间、方法、URL、状态码、耗时。
 - 如需调试 payload，将 SAVE_PAYLOAD=1，相关工具会把原始 JSON 文本���入 logs/ 目录（由 utils/files.js 实现）。
+- PM2 运行日志已通过 ecosystem.config.js 固定到项目本地 logs/out 与 logs/errors。
 
 常见接入步骤（Shopify 后台）
 - 在 Shopify 管理后台 → Settings → Notifications → Webhooks，新增 Webhook：
