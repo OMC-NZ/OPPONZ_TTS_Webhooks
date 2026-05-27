@@ -34,10 +34,15 @@ function normalizeLineDetails(input) {
     }, []);
 }
 
+function trimToMax(value, maxLength) {
+    return String(value ?? "").trim().slice(0, maxLength);
+}
+
 async function createOrder(shopShort, body) {
     const url = process.env.CEVA_ORDER_URL;
     const token = await getCEVAToken();
     const lineDetails = normalizeLineDetails(body.line_items);
+    const shippingAddress = body.shipping_address || {};
     // 如果过滤后没东西，直接返回，不去调 CEVA
     if (lineDetails.length === 0) {
         console.log(`${shopShort.name} ${body.name}没有可供CEVA发货的商品`);
@@ -55,14 +60,14 @@ async function createOrder(shopShort, body) {
         "requestedDate": toLocalISOStringWithoutTZ(body.created_at),
         "poRecyclingPeriodInMonths": 99999,
         "shippingAddress": {
-            "organisation": body.shipping_address.company ?? "",
-            "recipient": body.shipping_address.name,
-            "deliveryAddress": body.shipping_address.address1,
-            "suburb": body.shipping_address.address2,
-            "city": body.shipping_address.province,
+            "organisation": shippingAddress.company ?? "",
+            "recipient": shippingAddress.name,
+            "deliveryAddress": trimToMax(shippingAddress.address1, 40),
+            "suburb": shippingAddress.address2,
+            "city": shippingAddress.province,
             "countryCode": "NZ",
-            "postCode": body.shipping_address.zip,
-            "mobileNumber": body.shipping_address.phone ?? "",
+            "postCode": shippingAddress.zip,
+            "mobileNumber": shippingAddress.phone ?? "",
         },
         "lineDetails": lineDetails,
     };

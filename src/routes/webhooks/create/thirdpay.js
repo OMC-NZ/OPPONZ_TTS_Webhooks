@@ -48,7 +48,7 @@ router.post("/", async (req, res) => {  // Buffer format
         try {
             await sendMail({
                 to: process.env.DEVE_EMAIL,
-                subject: `[Webhook] JSON Parse Failed for Third-Party Payment Order ${order.name}`,
+                subject: `[Webhook] JSON Parse Failed for Third-Party Payment Order`,
                 text: `Error Logs was saved at 'logs/errors/OPPONZ-TTS-Webhooks-error.log'.`,
                 key: 'ONLINEKONEC'
             });
@@ -129,7 +129,7 @@ router.post("/", async (req, res) => {  // Buffer format
         try {
             await sendMail({
                 to: process.env.DEVE_EMAIL,
-                subject: `[Error] Processing Third-Party Payment Order ${order.name} Failed`,
+                subject: `[Error] Processing Third-Party Payment Order ${order?.name || "Unknown Order"} Failed`,
                 text: `Error Logs was saved at 'logs/errors/OPPONZ-TTS-Webhooks-error.log'.`,
                 key: 'ONLINEKONEC'
             });

@@ -150,8 +150,14 @@ router.post("/", async (req, res) => {           // Buffer
         try {
             await sendMail({
                 to: process.env.DEVE_EMAIL,
-                subject: 'Order Creation Failed',
-                html: e,
+                subject: `${order?.name || "Unknown Order"} Order Creation Failed`,
+                text: [
+                    `${order?.name || "Unknown order"} createOrder failed.`,
+                    `Message: ${e?.message || e}`,
+                    "",
+                    "Stack:",
+                    e?.stack || ""
+                ].join("\n"),
                 key: 'ONLINEKONEC'
             });
         } catch (mailErr) {
