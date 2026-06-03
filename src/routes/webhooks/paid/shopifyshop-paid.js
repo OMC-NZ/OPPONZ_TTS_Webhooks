@@ -13,7 +13,8 @@ const RAW_LIMIT = process.env.WEBHOOK_RAW_LIMIT || "5mb";
 
 const TTS_SECRET = process.env.TTS_WEBHOOK_SECRET || "";
 const MYFIRST_SECRET = process.env.MYFIRST_WEBHOOK_SECRET || "";
-const WEBHOOK_SECRETS = [TTS_SECRET, MYFIRST_SECRET].filter(Boolean);
+const AQARA_SECRET = process.env.AQARA_WEBHOOK_SECRET || "";
+const WEBHOOK_SECRETS = [TTS_SECRET, MYFIRST_SECRET, AQARA_SECRET].filter(Boolean);
 
 const ALLOW_UNVERIFIED = /^(1|true|yes)$/i.test((process.env.ALLOW_UNVERIFIED || "").trim());
 
@@ -70,6 +71,11 @@ router.post("/", async (req, res) => {
             name: "MF",
             billTo: "2087400",
             shipTo: "2087401"
+        },
+        "aqara-new-zealand": {
+            name: "AQARA",
+            billTo: "2087450",
+            shipTo: "2087451"
         },
     };
     const shopShort = shopShortNameMap[shopName];
