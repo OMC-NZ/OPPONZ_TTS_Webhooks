@@ -89,7 +89,7 @@ router.post("/", async (req, res) => {           // Buffer
             billTo: "2087400",
             shipTo: "2087401"
         },
-        "aqara-new-zealand": {
+        "xy2him-cw": {
             name: "AQARA",
             billTo: "2087450",
             shipTo: "2087451"
