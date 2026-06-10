@@ -26,7 +26,7 @@ function normalizeLineDetails(input) {
         acc.push({
             productType: "C",
             branch: "4002",
-            productCode: item.sku ?? "",
+            productCode: String(item.sku).toUpperCase() ?? "",
             requestedQuantity: item.quantity ?? 0,
         });
 
@@ -115,7 +115,12 @@ async function createOrder(shopShort, body) {
         { timeoutMs: 15000, retries: 2, baseDelayMs: 500 } // 可调参数
     );
 
-    return res.json();
+    const data = await res.json();
+
+    return {
+        ...data,
+        sentLineDetails: lineDetails
+    };
 }
 
 module.exports = createOrder;
