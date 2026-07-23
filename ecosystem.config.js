@@ -15,5 +15,8 @@ module.exports = {
             out_file: path.join(logsRoot, "out", "OPPONZ-TTS-Webhooks-out.log"),
             log_date_format: "YYYY-MM-DD HH:mm:ss Z"
         }
-    ]
+    ],
+    env: {
+        NODE_EXTRA_CA_CERTS: "/var/www/OPPONZ_TTS_Webhooks/certs/ceva-api-domain-bundle.pem"
+    }
 };
