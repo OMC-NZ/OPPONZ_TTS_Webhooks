@@ -11,7 +11,8 @@ const router = express.Router();
 const RAW_LIMIT = process.env.WEBHOOK_RAW_LIMIT || "5mb";
 
 const OPPOSTORE_SECRET = process.env.OPPOSTORE_WEBHOOK_SECRET || "";
-const WEBHOOK_SECRETS = [OPPOSTORE_SECRET].filter(Boolean);
+const TTS_SECRET = process.env.TTS_WEBHOOK_SECRET || "";
+const WEBHOOK_SECRETS = [OPPOSTORE_SECRET, TTS_SECRET].filter(Boolean);
 
 const ALLOW_UNVERIFIED = /^(1|true|yes)$/i.test((process.env.ALLOW_UNVERIFIED || "").trim());
 
@@ -63,11 +64,19 @@ router.post("/", async (req, res) => {  // Buffer format
     const hasGilrose = Array.isArray(order.payment_gateway_names) && order.payment_gateway_names.some((s) => /gilrose/i.test(String(s)));
     if (!hasGilrose) return;
 
+    const shopDomain = req.get("X-Shopify-Shop-Domain") || "";
+    const shopName = shopDomain.replace(".myshopify.com", "");
+    const shopifyOrderPrefixMap = {
+        "thetechnologystorenz": "TTS",
+        "oppostore-nz": "Shopify"
+    };
+    const shopifyOrderPrefix = shopifyOrderPrefixMap[shopName] || "Shopify";
+
     const LIMIT_AMOUNT = 499;
 
     try {
         if (Number(order.total_price) >= LIMIT_AMOUNT) {
-            const result = await createOrder(order);
+            const result = await createOrder(order, { shopifyOrderPrefix });
             if (!result.success) {
                 console.warn("[createOrder 失败]", {
                     time: getNZLogTime(),

@@ -3,10 +3,11 @@ const { postJSONWithRetries } = require("../utils/postJSONWithRetries");
 const { getNZLogTime } = require("../utils/timeUtils");
 const { sendMail } = require("../utils/sendMail");
 
-async function createOrder(body) {
+async function createOrder(body, options = {}) {
     const url = process.env.GILROSE_API_URL;
     const hmacKey = process.env.GILROSE_HMACKEY;
     const devEmail = process.env.DEVE_EMAIL?.trim();
+    const shopifyOrderPrefix = options.shopifyOrderPrefix || "Shopify";
 
     const sendDevMail = async ({ subject, text }) => {
         if (!devEmail) {
@@ -55,7 +56,7 @@ async function createOrder(body) {
     }
 
     const payload = {
-        "shopifyOrderId": "Shopify" + body.name,
+        "shopifyOrderId": shopifyOrderPrefix + body.name,
         "totalAmount": body.total_price,
         "storeName": "OPPO NZ",
         "storeNumber": "D6468",
